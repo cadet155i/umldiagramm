@@ -1,27 +1,22 @@
-@startuml test_name
-    autonumber
-
-    actor Client
-    
-    participant UI
-    participant Back
-
-    activate Client
-      Client -> UI: Запрос 1
-
-    activate UI
-      UI -> Back: Запрос от клиента
-
-    activate Back
-    
-      note right of UI: важное пояснение
+@startuml And_Xor
+    start
+    :Регистрация/Вход в аккаунт;
+    fork
+      :Клиент зарегистрирован;
+    fork again
+      :Клиенту необходима регистрация;
+      end fork
+      :Подтверждение учетных данных клиента;
+      :Выбор товара и добавление в корзину;
+      :Выбор способа доставки и оплаты;
+      if(товар в наличии?) then (да)
+       :оформление заказа;
+       else(нет)
+       :Уведомление клиента о недоступности товара;
+       :Выбор другого товара или удаление отсутствующего из заказа;
+      endif
       
-      Back -> Back: Думает
-      UI <-- Back: Ответ от Back
 
-    deactivate Back
-      Client <-- UI: Ответ от UI
-
-    deactivate UI
-    deactivate Client1122222
+      
+    stop
 @enduml
