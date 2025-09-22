@@ -23,5 +23,5 @@
       Client <-- UI: Ответ от UI
 
     deactivate UI
-    deactivate Client
+    deactivate Client11
 @enduml
