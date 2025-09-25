@@ -1,4 +1,4 @@
-@startuml
+@startuml MinDiagrammus
 actor Customer as U
 participant "WEB UI" as UI
 participant "Order controller" as C
@@ -12,3 +12,5 @@ C -> PS :проведение платежа
 PS -> C :результат платежа
 C -> UI :подтверждение платежа
 UI -> U :информирование покупателя
+
+@enduml
