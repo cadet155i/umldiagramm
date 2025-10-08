@@ -1,4 +1,4 @@
-@startuml 
+@startuml Diagramm
 
 abstract class Payment {
     -amount()
@@ -8,32 +8,38 @@ abstract class Payment {
     +getpaymentDate : paymentDate ()
     +gettransactionld : transactionld ()
     }
-interface processPayment
 
 class CashPayment  {
     -cashProvided()
     +getcashProvided : cashProvided()
 }
-Payment--|>CashPayment
+
 class CardPayment {
     -numbercard()
     -namesuser()
-    -DateEnd()
+    -dateend()
     +getnumbercard() : numbercard ()
     +getnamesuser() : namesuser ()
     +getDateEnd() : DateEnd ()
-
     }
-interface processvalidation
-Payment--|>CardPayment
-CardPayment..|>processPayment
-CashPayment..|>processPayment
-CashPayment..|>processvalidation
+
 Class PaymentManager{
-    processALLPayments()
+    processallpayments()
 }
+
+interface IProcessPayment
+interface IProcessValidation
+
+CardPayment..|>IProcessPayment
+CashPayment..|>IProcessPayment
+CashPayment..|>IProcessValidation
+
+Payment--|>CashPayment
+Payment--|>CardPayment
 Payment--|>PaymentManager
-PaymentManager..|>processPayment
+PaymentManager..|>IProcessPayment
+Payment--|>PaymentManager
+PaymentManager..|>IProcessPayment
 
 
 @enduml
