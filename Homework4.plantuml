@@ -1,16 +1,39 @@
-@startuml MinDiagrammus
-actor Customer as U
-participant "WEB UI" as UI
-participant "Order controller" as C
-participant "Payment Service" as PS
-database "база данных" as DB 
+@startuml 
 
-U -> UI :запрос на оформление заказа
-UI -> C :передача данных заказа
-C -> DB :сохранение заказа
-C -> PS :проведение платежа
-PS -> C :результат платежа
-C -> UI :подтверждение платежа
-UI -> U :информирование покупателя
+abstract class Payment {
+    -amount()
+    -paymentDate()
+    -transactionld()
+    +getamount : amount()
+    +getpaymentDate : paymentDate ()
+    +gettransactionld : transactionld ()
+    }
+interface processPayment
+
+class CashPayment  {
+    -cashProvided()
+    +getcashProvided : cashProvided()
+}
+Payment--|>CashPayment
+class CardPayment {
+    -numbercard()
+    -namesuser()
+    -DateEnd()
+    +getnumbercard() : numbercard ()
+    +getnamesuser() : namesuser ()
+    +getDateEnd() : DateEnd ()
+
+    }
+interface processvalidation
+Payment--|>CardPayment
+CardPayment..|>processPayment
+CashPayment..|>processPayment
+CashPayment..|>processvalidation
+Class PaymentManager{
+    processALLPayments()
+}
+Payment--|>PaymentManager
+PaymentManager..|>processPayment
+
 
 @enduml
