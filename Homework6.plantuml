@@ -1,0 +1,98 @@
+@startuml OnlineEducationSystem
+
+!define RECTANGLE class
+
+' Основные классы пользователей
+abstract class User {
+  - userId: Long
+  - email: String
+  - password: String
+  - fullName: String
+  - phone: String
+  + authenticate()
+  + updateProfile()
+}
+
+class Student {
+  - studentId: Long
+  - group: String
+  - semester: Integer
+  <<user>>
+  + enrollCourse()
+  + viewGrades()
+}
+
+class Instructor {
+  - instructorId: Long
+  - specialization: String
+  - experienceYears: Integer
+  <<user>>
+  + createCourse()
+  + gradeStudents()
+}
+
+' Сущности образовательного процесса
+class Course {
+  - courseId: Long
+  - title: String
+  - description: String
+  - durationWeeks: Integer
+  - price: Double
+  + startCourse()
+  + addMaterial()
+}
+
+class Enrollment {
+  - enrollmentId: Long
+  - enrollmentDate: Date
+  - grade: Double
+  - status: EnrollmentStatus
+  + completeCourse()
+  + getProgress()
+}
+
+class Module {
+  - moduleId: Long
+  - title: String
+  - orderNumber: Integer
+  + completeModule()
+}
+
+class Material {
+  - materialId: Long
+  - title: String
+  - fileUrl: String
+  - durationMinutes: Integer
+  + download()
+  + markCompleted()
+}
+
+' Вспомогательные классы
+class PaymentProcessor {
+  + processPayment(amount: Double): boolean
+  + refund(amount: Double)
+}
+
+' Наследование пользователей
+Student --|> User : "наследование (студент — подтип пользователя)"
+Instructor --|> User : "наследование (преподаватель — подтип пользователя)"
+
+' Ассоциативный класс Enrollment
+Student }o--o{ Enrollment : "записывается на курсы\n(ассоциация, 0..*)"
+Course }o--o{ Enrollment : "имеет зачисления студентов\n(ассоциация, 0..*)"
+Enrollment ..> Enrollment : "ассоциативный класс (зачисление с датой и оценкой)"
+
+' Связи курсов и преподавателей
+Instructor ||--o{ Course : "ведет курсы\n(ассоциация, 0..*)"
+
+' Композиция: Курс содержит модули
+Course *--o "1..*" Module : "состоит из модулей\nкомпозиция (при удалении курса удаляются модули)"
+
+' Композиция: Модуль содержит материалы
+Module *--o "1..*" Material : "содержит материалы\nкомпозиция (при удалении модуля удаляются материалы)"
+
+' Зависимости
+Course ..> PaymentProcessor : "зависимость (использует процессор для оплаты)"
+Student ..> PaymentProcessor : "зависимость (оплачивает курсы)"
+
+@enduml
