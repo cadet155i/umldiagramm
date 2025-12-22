@@ -1,0 +1,43 @@
+@startuml BankCardLifecycle
+
+[*] --> Active : "Выпуск карты"
+skinparam state {
+  BackgroundColor<<active>> LightGreen
+  BackgroundColor<<blocked>> Orange
+  BackgroundColor<<expired>> Red
+  BackgroundColor<<lost>> Gray
+}
+
+state Active <<composite>> {
+  [*] --> Normal : "Обычный статус"
+  Normal --> Premium : "Повышение статуса клиента"
+  Premium --> Normal : "Понижение статуса клиента"
+  
+  state Premium {
+    [*] --> PremiumActive
+  }
+}
+
+Active --> Blocked : "[Попытка мошенничества]\nили [3 неверных PIN]"
+Blocked --> Active : "[Разблокировка менеджером]"
+Blocked --> Expired : "after (срок действия истек)"
+Active --> Expired : "after (срок действия истек)"
+Active --> Lost : "[Клиент сообщил об утере]"
+Lost --> Blocked : "[Карта найдена]"
+Lost --> Active : "[Выпуск дубликата]"
+Expired --> [*] : "Уничтожение"
+Blocked --> [*] : "[Списание карты]"
+Lost --> [*] : "[Списание карты]"
+
+note right of Active
+  Составное состояние:
+  Активная карта с под-состояниями
+  Обычная / Премиум
+end note
+
+note right of Expired
+  Тайм-аут: автоматический переход
+  после истечения срока действия
+end note
+
+@enduml
