@@ -1,0 +1,52 @@
+@startuml CreditApplicationReview
+
+left to right direction
+
+actor "Клиент" as Client
+actor "Кредитный менеджер" as Manager
+actor "Служба безопасности" as Security
+actor "Бюро кредитных историй (БКИ)" as BKI
+
+rectangle "Рассмотрение кредитной заявки" {
+  
+  usecase "Подать заявку на кредит" as UC1
+  usecase "Загрузить документы" as UC10
+  usecase "Проверить документы" as UC2
+  usecase "Оценить кредитоспособность" as UC3
+  usecase "Провести скоринг" as UC4
+  usecase "Проверить кредитную историю" as UC5
+  usecase "Запросить кредитную историю" as UC11
+  usecase "Проверить анкетные данные" as UC6
+  usecase "Проверить наличие судимостей" as UC12
+  usecase "Провести AML-проверку" as UC13
+  usecase "Вынести решение" as UC7
+  usecase "Выдать кредит" as UC8
+  usecase "Отказать в кредите" as UC9
+}
+
+Client --> UC1
+Manager --> UC2
+Manager --> UC3
+Manager --> UC7
+Security --> UC6
+Security --> UC12
+Security --> UC13
+BKI --> UC5
+BKI --> UC11
+
+' Включение (include)
+UC2 ..> UC10 : <<include>>
+UC3 ..> UC4 : <<include>>
+UC3 ..> UC5 : <<include>>
+
+' Расширение (extend)
+UC6 <.. UC12 : <<extend>>
+UC6 <.. UC13 : <<extend>>
+UC7 <.. UC8 : <<extend>>
+UC7 <.. UC9 : <<extend>>
+
+' Обобщение (generalization)
+UC1 <|-- UC10
+UC5 <|-- UC11
+
+@enduml
