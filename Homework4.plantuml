@@ -1,45 +1,52 @@
 @startuml Diagramm
 
 abstract class Payment {
-    -amount()
-    -paymentDate()
-    -transactionld()
-    +getamount : amount()
-    +getpaymentDate : paymentDate ()
-    +gettransactionld : transactionld ()
-    }
+  - amount: double
+  - paymentDate: Date
+  - transactionId: String
+  + getAmount(): double
+  + getPaymentDate(): Date
+  + getTransactionId(): String
+}
 
-class CashPayment  {
-    -cashProvided()
-    +getcashProvided : cashProvided()
+class CashPayment {
+  - cashProvided: double
+  + getCashProvided(): double
+  + processPayment()
+  + validate()
 }
 
 class CardPayment {
-    -numbercard()
-    -namesuser()
-    -dateend()
-    +getnumbercard() : numbercard ()
-    +getnamesuser() : namesuser ()
-    +getDateEnd() : DateEnd ()
-    }
-
-Class PaymentManager{
-    processallpayments()
+  - numberCard: String
+  - nameUser: String
+  - dateEnd: Date
+  + getNumberCard(): String
+  + getNameUser(): String
+  + getDateEnd(): Date
+  + processPayment()
+  + validate()
 }
 
-interface IProcessPayment
-interface IProcessValidation
+class PaymentManager {
+  - payments: List<Payment>
+  + addPayment(payment: Payment)
+  + processAllPayments()
+}
 
-CardPayment..|>IProcessPayment
-CashPayment..|>IProcessPayment
-CashPayment..|>IProcessValidation
+interface IProcessPayment {
+  + processPayment()
+}
 
-Payment--|>CashPayment
-Payment--|>CardPayment
-Payment--|>PaymentManager
-PaymentManager..|>IProcessPayment
-Payment--|>PaymentManager
-PaymentManager..|>IProcessPayment
+interface IProcessValidation {
+  + validate()
+}
 
+CashPayment ..|> IProcessPayment : implements
+CashPayment ..|> IProcessValidation : implements
+CardPayment ..|> IProcessPayment : implements
+
+Payment <|-- CashPayment
+Payment <|-- CardPayment
+PaymentManager o--> "many" Payment : contains
 
 @enduml
