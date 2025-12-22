@@ -1,0 +1,59 @@
+@startuml OnlineTransferSequence
+
+actor "Клиент" as Client
+participant "Мобильное\nприложение" as App
+participant "Бэкенд" as Backend
+participant "База данных" as DB
+participant "СМС-сервис" as SMS
+
+== Инициация перевода ==
+Client -> App: Ввод данных перевода
+activate App
+
+App -> Backend: POST /transfer (сумма, счёт_от, счёт_до)
+activate Backend
+
+== Проверка баланса ==
+alt [Недостаточно средств]
+    Backend -> DB: SELECT balance FROM accounts WHERE id = счёт_от
+    activate DB
+    DB --> Backend: balance < amount
+    Backend --> App: 400 Bad Request "Недостаточно средств"
+    deactivate DB
+    deactivate Backend
+    App --> Client: "Недостаточно средств"
+    deactivate App
+else [Достаточно средств]
+    DB --> Backend: balance >= amount
+    deactivate DB
+
+    == Блокировка счетов ==
+    Backend -> DB: BEGIN TRANSACTION
+    Backend -> DB: UPDATE accounts SET balance = balance - amount WHERE id = счёт_от
+    Backend -> DB: UPDATE accounts SET balance = balance + amount WHERE id = счёт_до
+    DB --> Backend: OK
+
+    == Подтверждение перевода ==
+    opt [Требуется SMS-подтверждение]
+        Backend -> SMS: sendSMS(phone, код_подтверждения)
+        note right: Асинхронное сообщение
+        App -> Client: "Введите SMS-код"
+        Client -> App: SMS-код
+        App -> Backend: POST /confirm (код)
+        Backend -> DB: VERIFY SMS code
+        DB --> Backend: valid/invalid
+    end
+
+    Backend -> DB: COMMIT
+    DB --> Backend: Transaction completed
+    Backend --> App: 200 OK "Перевод выполнен"
+    deactivate Backend
+    App --> Client: "Перевод успешен"
+    deactivate App
+end
+
+== Асинхронное уведомление ==
+Backend --> SMS: sendNotification("Перевод выполнен")
+note right: Асинхронное сообщение
+
+@enduml
